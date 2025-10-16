@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_testing_lab/data/validator.dart';
 
 class UserRegistrationForm extends StatefulWidget {
   const UserRegistrationForm({super.key});
@@ -14,7 +15,7 @@ class _UserRegistrationFormState extends State<UserRegistrationForm> {
   final _passwordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
   final _nameController = TextEditingController();
-
+  Validator _validator = Validator();
   late final FocusNode _emailFocusNode;
 
   bool _isLoading = false;
@@ -32,22 +33,15 @@ class _UserRegistrationFormState extends State<UserRegistrationForm> {
     });
   }
 
-  bool isValidEmail(String email) {
-    final emailRegex = RegExp(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$');
-    return emailRegex.hasMatch(email);
-  }
-
-  bool isValidPassword(String password) {
-    return true;
-  }
 
   Future<void> _submitForm() async {
+    if (!_formKey.currentState!.validate()) return; // ✅ validate first!
+
     setState(() {
       _isLoading = true;
       _message = '';
     });
 
-    // Simulate API call
     await Future.delayed(const Duration(seconds: 2));
 
     setState(() {
@@ -71,20 +65,12 @@ class _UserRegistrationFormState extends State<UserRegistrationForm> {
                 labelText: 'Full Name',
                 border: OutlineInputBorder(),
               ),
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'Please enter your full name';
-                }
-                if (value.length < 2) {
-                  return 'Name must be at least 2 characters';
-                }
-                return null;
-              },
+              validator: (value) => _validator.validateUserName(value),
             ),
             const SizedBox(height: 16),
             TextFormField(
-              key: _emailFieldKey,              // ← add this
-              focusNode: _emailFocusNode,       // ← and this
+              key: _emailFieldKey, // ← add this
+              focusNode: _emailFocusNode, // ← and this
               controller: _emailController,
               decoration: InputDecoration(
                 hintStyle: TextStyle(color: Colors.grey[500], fontSize: 15),
@@ -94,15 +80,7 @@ class _UserRegistrationFormState extends State<UserRegistrationForm> {
               ),
               keyboardType: TextInputType.emailAddress,
               autovalidateMode: AutovalidateMode.disabled, // rely on blur
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'Please enter your email';
-                }
-                if (!isValidEmail(value)) {
-                  return 'Please enter a valid email';
-                }
-                return null;
-              },
+              validator: (value) => _validator.emailValidation(value),
             ),
             const SizedBox(height: 16),
             TextFormField(
@@ -113,15 +91,7 @@ class _UserRegistrationFormState extends State<UserRegistrationForm> {
                 helperText: 'At least 8 characters with numbers and symbols',
               ),
               obscureText: true,
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'Please enter a password';
-                }
-                if (!isValidPassword(value)) {
-                  return 'Password is too weak';
-                }
-                return null;
-              },
+              validator: (value) => _validator.validatePassword(value),
             ),
             const SizedBox(height: 16),
             TextFormField(
@@ -131,20 +101,19 @@ class _UserRegistrationFormState extends State<UserRegistrationForm> {
                 border: OutlineInputBorder(),
               ),
               obscureText: true,
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'Please confirm your password';
-                }
-                if (value != _passwordController.text) {
-                  return 'Passwords do not match';
-                }
-                return null;
-              },
+              validator:
+                  (value) => _validator.vaidateComformPassword(
+                    value,
+                    _passwordController.text,
+                  ),
             ),
             const SizedBox(height: 24),
             ElevatedButton(
               onPressed: _isLoading ? null : _submitForm,
-              child: _isLoading ? const CircularProgressIndicator() : const Text('Register'),
+              child:
+                  _isLoading
+                      ? const CircularProgressIndicator()
+                      : const Text('Register'),
             ),
             if (_message.isNotEmpty)
               Padding(
@@ -152,7 +121,10 @@ class _UserRegistrationFormState extends State<UserRegistrationForm> {
                 child: Text(
                   _message,
                   style: TextStyle(
-                    color: _message.contains('successful') ? Colors.green : Colors.red,
+                    color:
+                        _message.contains('successful')
+                            ? Colors.green
+                            : Colors.red,
                     fontWeight: FontWeight.bold,
                   ),
                   textAlign: TextAlign.center,
@@ -166,7 +138,7 @@ class _UserRegistrationFormState extends State<UserRegistrationForm> {
 
   @override
   void dispose() {
-    _emailFocusNode.dispose();               // ← dispose it
+    _emailFocusNode.dispose(); // ← dispose it
     _emailController.dispose();
     _passwordController.dispose();
     _confirmPasswordController.dispose();
@@ -174,4 +146,3 @@ class _UserRegistrationFormState extends State<UserRegistrationForm> {
     super.dispose();
   }
 }
-
