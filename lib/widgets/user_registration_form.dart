@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_testing_lab/data/validator.dart';
 
 class UserRegistrationForm extends StatefulWidget {
   const UserRegistrationForm({super.key});
@@ -14,7 +15,7 @@ class _UserRegistrationFormState extends State<UserRegistrationForm> {
   final _passwordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
   final _nameController = TextEditingController();
-
+  Validator _validator = Validator() ;
   late final FocusNode _emailFocusNode;
 
   bool _isLoading = false;
@@ -32,14 +33,7 @@ class _UserRegistrationFormState extends State<UserRegistrationForm> {
     });
   }
 
-  bool isValidEmail(String email) {
-    final emailRegex = RegExp(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$');
-    return emailRegex.hasMatch(email);
-  }
 
-  bool isValidPassword(String password) {
-    return true;
-  }
 
   Future<void> _submitForm() async {
     setState(() {
@@ -98,7 +92,7 @@ class _UserRegistrationFormState extends State<UserRegistrationForm> {
                 if (value == null || value.isEmpty) {
                   return 'Please enter your email';
                 }
-                if (!isValidEmail(value)) {
+                if (!_validator.isValidEmail(value)) {
                   return 'Please enter a valid email';
                 }
                 return null;
@@ -117,7 +111,7 @@ class _UserRegistrationFormState extends State<UserRegistrationForm> {
                 if (value == null || value.isEmpty) {
                   return 'Please enter a password';
                 }
-                if (!isValidPassword(value)) {
+                if (!_validator.isValidPassword(value)) {
                   return 'Password is too weak';
                 }
                 return null;
