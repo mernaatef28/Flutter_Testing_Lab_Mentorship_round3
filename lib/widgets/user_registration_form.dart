@@ -9,19 +9,33 @@ class UserRegistrationForm extends StatefulWidget {
 
 class _UserRegistrationFormState extends State<UserRegistrationForm> {
   final _formKey = GlobalKey<FormState>();
+  final _emailFieldKey = GlobalKey<FormFieldState<String>>();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
   final _nameController = TextEditingController();
 
+  late final FocusNode _emailFocusNode;
+
   bool _isLoading = false;
   String _message = '';
 
-  bool isValidEmail(String email) {
-    final emailRegex = RegExp(r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$");
-    return emailRegex.hasMatch(email);
+  @override
+  void initState() {
+    super.initState();
+    _emailFocusNode = FocusNode();
+    _emailFocusNode.addListener(() {
+      // When email field loses focus, validate it immediately
+      if (!_emailFocusNode.hasFocus) {
+        _emailFieldKey.currentState?.validate();
+      }
+    });
   }
 
+  bool isValidEmail(String email) {
+    final emailRegex = RegExp(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$');
+    return emailRegex.hasMatch(email);
+  }
 
   bool isValidPassword(String password) {
     return true;
@@ -69,29 +83,26 @@ class _UserRegistrationFormState extends State<UserRegistrationForm> {
             ),
             const SizedBox(height: 16),
             TextFormField(
-
+              key: _emailFieldKey,              // ← add this
+              focusNode: _emailFocusNode,       // ← and this
               controller: _emailController,
               decoration: InputDecoration(
-                hintStyle:
-                TextStyle(color: Colors.grey[500], fontSize: 15),
-                errorStyle:
-                 TextStyle(color: Colors.red[600], fontSize: 12),
-
+                hintStyle: TextStyle(color: Colors.grey[500], fontSize: 15),
+                errorStyle: TextStyle(color: Colors.red[600], fontSize: 12),
                 labelText: 'Email',
                 border: const OutlineInputBorder(),
               ),
               keyboardType: TextInputType.emailAddress,
+              autovalidateMode: AutovalidateMode.disabled, // rely on blur
               validator: (value) {
                 if (value == null || value.isEmpty) {
                   return 'Please enter your email';
                 }
-                if (!isValidEmail(value.toString())) {
+                if (!isValidEmail(value)) {
                   return 'Please enter a valid email';
                 }
                 return null;
               },
-
-
             ),
             const SizedBox(height: 16),
             TextFormField(
@@ -133,9 +144,7 @@ class _UserRegistrationFormState extends State<UserRegistrationForm> {
             const SizedBox(height: 24),
             ElevatedButton(
               onPressed: _isLoading ? null : _submitForm,
-              child: _isLoading
-                  ? const CircularProgressIndicator()
-                  : const Text('Register'),
+              child: _isLoading ? const CircularProgressIndicator() : const Text('Register'),
             ),
             if (_message.isNotEmpty)
               Padding(
@@ -143,9 +152,7 @@ class _UserRegistrationFormState extends State<UserRegistrationForm> {
                 child: Text(
                   _message,
                   style: TextStyle(
-                    color: _message.contains('successful')
-                        ? Colors.green
-                        : Colors.red,
+                    color: _message.contains('successful') ? Colors.green : Colors.red,
                     fontWeight: FontWeight.bold,
                   ),
                   textAlign: TextAlign.center,
@@ -159,6 +166,7 @@ class _UserRegistrationFormState extends State<UserRegistrationForm> {
 
   @override
   void dispose() {
+    _emailFocusNode.dispose();               // ← dispose it
     _emailController.dispose();
     _passwordController.dispose();
     _confirmPasswordController.dispose();
@@ -166,3 +174,4 @@ class _UserRegistrationFormState extends State<UserRegistrationForm> {
     super.dispose();
   }
 }
+
