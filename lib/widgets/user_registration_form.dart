@@ -18,8 +18,10 @@ class _UserRegistrationFormState extends State<UserRegistrationForm> {
   String _message = '';
 
   bool isValidEmail(String email) {
-    return email.contains('@');
+    final emailRegex = RegExp(r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$");
+    return emailRegex.hasMatch(email);
   }
+
 
   bool isValidPassword(String password) {
     return true;
@@ -67,21 +69,29 @@ class _UserRegistrationFormState extends State<UserRegistrationForm> {
             ),
             const SizedBox(height: 16),
             TextFormField(
+
               controller: _emailController,
-              decoration: const InputDecoration(
+              decoration: InputDecoration(
+                hintStyle:
+                TextStyle(color: Colors.grey[500], fontSize: 15),
+                errorStyle:
+                 TextStyle(color: Colors.red[600], fontSize: 12),
+
                 labelText: 'Email',
-                border: OutlineInputBorder(),
+                border: const OutlineInputBorder(),
               ),
               keyboardType: TextInputType.emailAddress,
               validator: (value) {
                 if (value == null || value.isEmpty) {
                   return 'Please enter your email';
                 }
-                if (!isValidEmail(value)) {
+                if (!isValidEmail(value.toString())) {
                   return 'Please enter a valid email';
                 }
                 return null;
               },
+
+
             ),
             const SizedBox(height: 16),
             TextFormField(
