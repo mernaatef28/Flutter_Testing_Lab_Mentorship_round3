@@ -25,13 +25,13 @@ class CartService extends ChangeNotifier {
     final index = _items.indexWhere((item) => item.id == id);
     if (index != -1) {
       if (newQuantity <= 0) {
-        _items.removeAt(index);
+        _items.removeAt(index);  // <--- removes the item entirely
       } else {
         _items[index].quantity = newQuantity;
       }
-      notifyListeners(); // ✅ Notify UI
     }
   }
+
 
   void clearCart() {
     _items.clear();

@@ -33,9 +33,8 @@ class _UserRegistrationFormState extends State<UserRegistrationForm> {
     });
   }
 
-
   Future<void> _submitForm() async {
-    if (!_formKey.currentState!.validate()) return; // ✅ validate first!
+    if (!_formKey.currentState!.validate()) return;
 
     setState(() {
       _isLoading = true;
@@ -138,7 +137,7 @@ class _UserRegistrationFormState extends State<UserRegistrationForm> {
 
   @override
   void dispose() {
-    _emailFocusNode.dispose(); // ← dispose it
+    _emailFocusNode.dispose();
     _emailController.dispose();
     _passwordController.dispose();
     _confirmPasswordController.dispose();
