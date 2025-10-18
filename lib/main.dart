@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_testing_lab/home_page.dart';
+import 'package:flutter_testing_lab/services/cart_service.dart';
+import 'package:provider/provider.dart';
 
 void main() {
   runApp(const FlutterTestingLabApp());
@@ -10,7 +12,9 @@ class FlutterTestingLabApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return  ChangeNotifierProvider(
+        create: (_) => CartService(),
+        child:MaterialApp(
       title: 'Flutter Testing Lab',
       theme: ThemeData(
         primarySwatch: Colors.blue,
@@ -18,6 +22,6 @@ class FlutterTestingLabApp extends StatelessWidget {
       ),
       home: const HomePage(),
       debugShowCheckedModeBanner: false,
-    );
+    ));
   }
 }
